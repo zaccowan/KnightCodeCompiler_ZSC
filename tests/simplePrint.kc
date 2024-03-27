@@ -1,0 +1,6 @@
+PROGRAM simplePrint
+BEGIN
+
+PRINT "Hello World!"
+
+END

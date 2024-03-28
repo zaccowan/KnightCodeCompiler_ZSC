@@ -10,15 +10,19 @@ public class Variable {
     private Object value;
 
 
-    public Variable(Object val, int VAR_TYPE) {
+
+    private final int stackIndex;
+
+    public Variable(String val, int VAR_TYPE, int stackIndex) {
         this.value = new Object();
         this.varType = VAR_TYPE;
+        this.stackIndex = stackIndex;
         switch(VAR_TYPE) {
             case TYPE_INTEGER:
-                this.value = (int) val;
+                this.value = Integer.valueOf(val);
                 break;
             case TYPE_STRING:
-                this.value = (String) val;
+                this.value = val;
                 break;
         }
     }
@@ -29,5 +33,8 @@ public class Variable {
 
     public Object getValue() {
         return value;
+    }
+    public int getStackIndex() {
+        return stackIndex;
     }
 }

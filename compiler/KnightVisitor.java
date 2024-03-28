@@ -7,6 +7,8 @@ import org.objectweb.asm.Opcodes;
 public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
 
     AsmGen generator;
+    SymbolTable symbolTable = new SymbolTable();
+    int addressIndex = 0;
 
     public void end() {
         generator.writeToFile();
@@ -117,6 +119,21 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitSetvar(KnightCodeParser.SetvarContext ctx) {
+        System.out.println(ctx.expr().getChildCount());
+        if( ctx.expr().getChildCount() == 1 ) {
+            addressIndex++;
+            symbolTable.addEntry(ctx.getChild(1).getText(), ctx.expr().getText(), Variable.TYPE_INTEGER, addressIndex);
+//            System.out.println(symbolTable.getEntry(ctx.getChild(1).getText()).getValue());
+        }
+//        else if( ctx.expr().getChildCount() == 3) {
+//            String operand1 = ctx.expr().getChild(0).getText();
+//            String operand2 = ctx.expr().getChild(2).getText();
+//            String operation = ctx.expr().getChild(1).getText();
+//            switch (operation){
+//                case "+":
+//                    break;
+//            }
+//        }
         return super.visitSetvar(ctx);
     }
 
@@ -248,23 +265,28 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     @Override
     public Object visitPrint(KnightCodeParser.PrintContext ctx) {
         String printVal;
-        if( ctx.getChildCount() > 1) {
+        int stackIndex;
+        if( symbolTable.contains(ctx.getChild(1).getText()) ) {
+            Variable value = symbolTable.getEntry( ctx.getChild(1).getText());
+            printVal = value.getValue().toString();
+            stackIndex = symbolTable.getEntry(ctx.getChild(1).getText()).getStackIndex();
+
+            generator.mv.visitLdcInsn(printVal);
+            generator.mv.visitVarInsn(Opcodes.ASTORE, stackIndex);
+
+            generator.mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+            generator.mv.visitVarInsn(Opcodes.ALOAD, stackIndex);
+            generator.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+        } else {
+            addressIndex++;
             printVal = ctx.getChild(1).getText().substring(1, ctx.getChild(1).getText().length()-1);
-        }else {
-            printVal = String.valueOf(ctx.getParent().getParent().getChildCount());
-            System.out.println(printVal);
+
+            generator.mv.visitLdcInsn(printVal);
+            generator.mv.visitVarInsn(Opcodes.ASTORE, addressIndex);
+            generator.mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+            generator.mv.visitVarInsn(Opcodes.ALOAD, addressIndex);
+            generator.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
         }
-
-        generator.mv.visitLdcInsn(printVal);
-        generator.mv.visitVarInsn(Opcodes.ASTORE, 1);
-
-
-        generator.mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-        generator.mv.visitVarInsn(Opcodes.ALOAD, 1);
-        generator.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-        generator.mv.visitInsn(Opcodes.RETURN);
-        generator.mv.visitMaxs(0,0);
-        generator.mv.visitEnd();
         return super.visitPrint(ctx);
     }
 

@@ -2,6 +2,6 @@ PROGRAM SimplePrint
 DECLARE
 BEGIN
 
-PRINT 3
+PRINT x
 
 END

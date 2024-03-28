@@ -7,15 +7,20 @@ public class Variable {
     protected static final int TYPE_STRING = 2;
 
     private final int varType;
-    private final Object value;
+    private Object value;
 
-    public Variable(String val) {
-        this.value = val;
-        this.varType = TYPE_STRING;
-    }
-    public Variable(int val ) {
-        this.value = val;
-        this.varType = TYPE_INTEGER;
+
+    public Variable(Object val, int VAR_TYPE) {
+        this.value = new Object();
+        this.varType = VAR_TYPE;
+        switch(VAR_TYPE) {
+            case TYPE_INTEGER:
+                this.value = (int) val;
+                break;
+            case TYPE_STRING:
+                this.value = (String) val;
+                break;
+        }
     }
 
     public int getVarType() {

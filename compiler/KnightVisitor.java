@@ -8,9 +8,10 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
 
     AsmGen generator;
 
-    KnightVisitor(AsmGen gen) {
-        this.generator = gen;
+    public void end() {
+        generator.writeToFile();
     }
+
 
     /**
      * {@inheritDoc}
@@ -22,6 +23,8 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitFile(KnightCodeParser.FileContext ctx) {
+        String programName = ctx.getChild(1).getText();
+        generator = new AsmGen(programName);
         return super.visitFile(ctx);
     }
 
@@ -48,6 +51,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitVariable(KnightCodeParser.VariableContext ctx) {
+
         return super.visitVariable(ctx);
     }
 
@@ -243,8 +247,15 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitPrint(KnightCodeParser.PrintContext ctx) {
+        String printVal;
+        if( ctx.getChildCount() > 1) {
+            printVal = ctx.getChild(1).getText().substring(1, ctx.getChild(1).getText().length()-1);
+        }else {
+            printVal = String.valueOf(ctx.getParent().getParent().getChildCount());
+            System.out.println(printVal);
+        }
 
-        generator.mv.visitLdcInsn(ctx.getChild(1).getText());
+        generator.mv.visitLdcInsn(printVal);
         generator.mv.visitVarInsn(Opcodes.ASTORE, 1);
 
 

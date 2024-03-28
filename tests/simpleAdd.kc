@@ -1,0 +1,7 @@
+PROGRAM simpleAdd
+DECLARE
+BEGIN
+
+PRINT (3 + 4)
+
+END

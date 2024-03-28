@@ -1,6 +1,7 @@
-PROGRAM simplePrint
+PROGRAM SimplePrint
+DECLARE
 BEGIN
 
-PRINT "Hello World!"
+PRINT 3
 
 END

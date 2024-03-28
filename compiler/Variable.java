@@ -6,16 +6,41 @@ public class Variable {
     protected static final int TYPE_INTEGER = 1;
     protected static final int TYPE_STRING = 2;
 
-    private final int varType;
-    private final Object value;
+    private int varType;
+    private Object value;
 
-    public Variable(String val) {
-        this.value = val;
-        this.varType = TYPE_STRING;
+
+
+    private final int stackIndex;
+
+    public Variable(int VAR_TYPE, int stackIndex) {
+        this.varType = VAR_TYPE;
+        this.stackIndex = stackIndex;
     }
-    public Variable(int val ) {
-        this.value = val;
-        this.varType = TYPE_INTEGER;
+
+    public Variable(String val, int VAR_TYPE, int stackIndex) {
+        this.value = new Object();
+        this.varType = VAR_TYPE;
+        this.stackIndex = stackIndex;
+        switch(VAR_TYPE) {
+            case TYPE_INTEGER:
+                this.value = Integer.valueOf(val);
+                break;
+            case TYPE_STRING:
+                this.value = val;
+                break;
+        }
+    }
+
+    public void setValue(String val) {
+        switch(varType) {
+            case TYPE_INTEGER:
+                this.value = Integer.valueOf(val);
+                break;
+            case TYPE_STRING:
+                this.value = val;
+                break;
+        }
     }
 
     public int getVarType() {
@@ -24,5 +49,8 @@ public class Variable {
 
     public Object getValue() {
         return value;
+    }
+    public int getStackIndex() {
+        return stackIndex;
     }
 }

@@ -26,19 +26,18 @@ public class kcc {
         String programName = args[0].substring(file.indexOf('/')+1, file.indexOf('.'));
         programName = Pattern.compile("^.").matcher(programName).replaceFirst(m -> m.group().toUpperCase());
 
-        System.out.println(programName);
-
-        AsmGen generator = new AsmGen(programName);
+        AsmGen generator;
         CharStream charStream = CharStreams.fromFileName(args[0]);
         KnightCodeLexer lexer = new KnightCodeLexer(charStream);
         TokenStream tokenStream = new CommonTokenStream(lexer);
         KnightCodeParser parser = new KnightCodeParser(tokenStream);
 
         ParseTree tree = parser.file();
-        KnightVisitor visitor = new KnightVisitor(generator);
+        KnightVisitor visitor = new KnightVisitor();
         visitor.visit(tree);
 
-        generator.writeToFile();
+        visitor.end(); //Writes Bytecode out to file
+        visitor.printAll();
     }
 
 }

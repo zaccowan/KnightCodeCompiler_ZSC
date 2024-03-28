@@ -3,15 +3,19 @@ PROGRAM Program1
 DECLARE
 	INTEGER x
 	INTEGER y
-	INTEGER z
+	STRING name
+	#INTEGER z
 
 BEGIN
 
 SET x := 10
 SET y := 12
-SET z := x + y
+SET name := "zac"
+#SET z := x + y
 
-PRINT z
+PRINT x
+PRINT y
+PRINT name
 
 END
 

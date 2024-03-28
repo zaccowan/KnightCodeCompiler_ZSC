@@ -12,6 +12,7 @@ public class AsmGen {
     public AsmGen(String programName) {
         this.programName = programName;
 
+
         cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES); // New ClassWriter where stack map frames are automatically computed from scratch. (Per ASM Documentation)
         cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, programName, null, "java/lang/Object", null);
 

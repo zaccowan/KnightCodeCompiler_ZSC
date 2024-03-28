@@ -26,8 +26,6 @@ public class kcc {
         String programName = args[0].substring(file.indexOf('/')+1, file.indexOf('.'));
         programName = Pattern.compile("^.").matcher(programName).replaceFirst(m -> m.group().toUpperCase());
 
-        System.out.println(programName);
-
         AsmGen generator;
         CharStream charStream = CharStreams.fromFileName(args[0]);
         KnightCodeLexer lexer = new KnightCodeLexer(charStream);
@@ -39,6 +37,7 @@ public class kcc {
         visitor.visit(tree);
 
         visitor.end(); //Writes Bytecode out to file
+        visitor.printAll();
     }
 
 }

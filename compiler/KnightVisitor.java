@@ -8,6 +8,12 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
 
     AsmGen generator;
     SymbolTable symbolTable = new SymbolTable();
+
+    public void printAll() {
+        symbolTable.printAll();
+    }
+
+
     int addressIndex = 0;
 
     public void end() {
@@ -53,7 +59,22 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitVariable(KnightCodeParser.VariableContext ctx) {
+        addressIndex++;
+        int type = Variable.TYPE_STRING;
+        switch (ctx.vartype().getText()) {
+            case "INTEGER":
+                type = Variable.TYPE_INTEGER;
+                break;
+            case "STRING":
+                type = Variable.TYPE_STRING;
+                break;
+            case "LONG":
+                // For implementing long type in future.
+                break;
+            // Continue pattern to expand variable types
 
+        }
+        symbolTable.declareEntry(ctx.identifier().getText(), type, addressIndex);
         return super.visitVariable(ctx);
     }
 
@@ -119,11 +140,14 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitSetvar(KnightCodeParser.SetvarContext ctx) {
-        System.out.println(ctx.expr().getChildCount());
-        if( ctx.expr().getChildCount() == 1 ) {
-            addressIndex++;
-            symbolTable.addEntry(ctx.getChild(1).getText(), ctx.expr().getText(), Variable.TYPE_INTEGER, addressIndex);
-//            System.out.println(symbolTable.getEntry(ctx.getChild(1).getText()).getValue());
+        String symbol = ctx.getChild(1).getText();
+        if( ctx.getChild(3).getChildCount() >0 && ctx.expr().getChildCount() == 1 ) {
+            String value = ctx.expr().getText();
+            symbolTable.updateSymbolValue(symbol, value);
+        }
+        else if( ctx.getChild(3).getText().charAt(0) == '\"') {
+            String value = ctx.getChild(3).getText().substring(1, ctx.getChild(3).getText().length()-1);
+            symbolTable.updateSymbolValue(symbol, value);
         }
 //        else if( ctx.expr().getChildCount() == 3) {
 //            String operand1 = ctx.expr().getChild(0).getText();

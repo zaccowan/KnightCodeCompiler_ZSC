@@ -25,15 +25,9 @@ public class SymbolTable {
         return symbolTable.containsKey(symbol);
     }
 
-    public void updateSymbolValue(String symbol, String value) {
-        Variable var = symbolTable.get(symbol);
-        var.setValue(value);
-        symbolTable.replace(symbol, var);
-    }
-
     public void printAll() {
         for( String key : symbolTable.keySet()) {
-            System.out.println("\nSymbol: " + key + ",\tValue: " + symbolTable.get(key).getValue().toString() + ",\tType: " + symbolTable.get(key).getVarType());
+            System.out.println("\nSymbol: " + key + ",\tVar Index: " + symbolTable.get(key).getVarIndex() +  ",\tType: " + symbolTable.get(key).getVarType());
         }
     }
 

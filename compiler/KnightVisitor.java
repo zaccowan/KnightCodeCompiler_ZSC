@@ -15,7 +15,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     }
 
 
-    int addressIndex = 0;
+    int addressIndex = 3; // Starts at 3 to reserve spots at the beginning for instances of scanners, ...
 
     public void end() {
         generator.writeToFile();
@@ -428,6 +428,32 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitRead(KnightCodeParser.ReadContext ctx) {
+        if( symbolTable.contains(ctx.getChild(1).getText()) ) {
+            Variable variable = symbolTable.getEntry( ctx.getChild(1).getText());
+            generator.mv.visitTypeInsn(Opcodes.NEW, "java/util/Scanner");
+            generator.mv.visitInsn(Opcodes.DUP);
+
+            generator.mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "in", "Ljava/io/InputStream;" );
+            generator.mv.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/util/Scanner", "<init>", "(Ljava/io/InputStream;)V", false);
+            generator.mv.visitVarInsn(Opcodes.ASTORE, 0);
+
+
+            switch(variable.getVarType()) {
+                case Variable.TYPE_INTEGER:
+                    generator.mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    generator.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/Scanner", "nextInt", "()I", false);
+                    generator.mv.visitVarInsn(Opcodes.ISTORE, variable.getVarIndex());
+                    break;
+                case Variable.TYPE_STRING:
+                    generator.mv.visitVarInsn(Opcodes.ALOAD, 0);
+                    generator.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/util/Scanner", "nextLine", "()Ljava/lang/String;", false);
+                    generator.mv.visitVarInsn(Opcodes.ASTORE, variable.getVarIndex());
+                    break;
+                default:
+                    break;
+            }
+
+        }
         return super.visitRead(ctx);
     }
 

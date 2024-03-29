@@ -1,9 +1,10 @@
 package compiler;
 
+import java.util.Scanner;
+
 public class Test {
     public static void main(String[] args) {
-        int x = 1;
-        int y = 2;
-        boolean z = x <= y;
+        Scanner scan = new Scanner(System.in);
+        String input = scan.nextLine();
     }
 }

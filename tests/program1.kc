@@ -3,20 +3,18 @@ PROGRAM Program1
 DECLARE
 	INTEGER x
 	INTEGER y
-	STRING name
-	#INTEGER z
+    STRING z
 
 BEGIN
 
-SET x := 10
-SET y := 12
-SET name := "zac"
-#SET z := x + y
+SET x := 12
+SET y := 13
+PRINT "Enter and string."
+READ z
 
 PRINT x
 PRINT y
-PRINT name
-PRINT "COWAN"
+PRINT z
 
 END
 

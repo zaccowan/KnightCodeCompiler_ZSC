@@ -140,28 +140,50 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitSetvar(KnightCodeParser.SetvarContext ctx) {
-        String symbol = ctx.getChild(1).getText();
-        Variable variable = symbolTable.getEntry(symbol);
+        String symbolToSet = ctx.getChild(1).getText();
+        Variable varToSet = symbolTable.getEntry(symbolToSet);
 
         if( ctx.getChild(3).getChildCount() >0 && ctx.expr().getChildCount() == 1 ) {
             String value = ctx.expr().getText();
             generator.mv.visitLdcInsn(Integer.valueOf(value));
-            generator.mv.visitVarInsn(Opcodes.ISTORE, variable.getVarIndex());
+            generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
         }
         else if( ctx.getChild(3).getText().charAt(0) == '\"') {
             String value = ctx.getChild(3).getText().substring(1, ctx.getChild(3).getText().length()-1);
             generator.mv.visitLdcInsn(value);
-            generator.mv.visitVarInsn(Opcodes.ASTORE, variable.getVarIndex());
+            generator.mv.visitVarInsn(Opcodes.ASTORE, varToSet.getVarIndex());
         }
-//        else if( ctx.expr().getChildCount() == 3) {
-//            String operand1 = ctx.expr().getChild(0).getText();
-//            String operand2 = ctx.expr().getChild(2).getText();
-//            String operation = ctx.expr().getChild(1).getText();
-//            switch (operation){
-//                case "+":
-//                    break;
-//            }
-//        }
+        else if( ctx.expr().getChildCount() == 3) {
+            Variable operand1 = symbolTable.getEntry(ctx.expr().getChild(0).getText());
+            Variable operand2 = symbolTable.getEntry(ctx.expr().getChild(2).getText());
+            String operation = ctx.expr().getChild(1).getText();
+            switch (operation){
+                case "+":
+                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
+                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
+                    generator.mv.visitInsn(Opcodes.IADD);
+                    generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    break;
+                case "-":
+                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
+                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
+                    generator.mv.visitInsn(Opcodes.ISUB);
+                    generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    break;
+                case "*":
+                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
+                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
+                    generator.mv.visitInsn(Opcodes.IMUL);
+                    generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    break;
+                case "/":
+                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
+                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
+                    generator.mv.visitInsn(Opcodes.IDIV);
+                    generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    break;
+            }
+        }
         return super.visitSetvar(ctx);
     }
 
@@ -315,10 +337,8 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
             addressIndex++;
             printVal = ctx.getChild(1).getText().substring(1, ctx.getChild(1).getText().length()-1);
 
-//            generator.mv.visitVarInsn(Opcodes.ASTORE, addressIndex);
             generator.mv.visitFieldInsn(Opcodes.GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
             generator.mv.visitLdcInsn(printVal);
-//            generator.mv.visitVarInsn(Opcodes.ALOAD, addressIndex);
             generator.mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
         }
         return super.visitPrint(ctx);

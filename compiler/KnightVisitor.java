@@ -2,6 +2,7 @@ package compiler;
 
 import lexparse.KnightCodeBaseVisitor;
 import lexparse.KnightCodeParser;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 
 public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
@@ -181,6 +182,79 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                     generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                     generator.mv.visitInsn(Opcodes.IDIV);
                     generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    break;
+                case ">":
+                    {
+                        Label elseLabel = new Label();
+                        Label endLabel = new Label();
+                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
+                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
+                        generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, elseLabel);
+
+                        generator.mv.visitLdcInsn(1);
+                        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+                        generator.mv.visitLabel(elseLabel);
+                        generator.mv.visitLdcInsn(0);
+
+                        generator.mv.visitLabel(endLabel);
+                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    }
+                    break;
+                case "<":
+                    {
+                        System.out.println("Less than triggered");
+                        Label elseLabel = new Label();
+                        Label endLabel = new Label();
+                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
+                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
+                        generator.mv.visitJumpInsn(Opcodes.IF_ICMPGE, elseLabel);
+
+                        generator.mv.visitLdcInsn(1);
+                        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+                        generator.mv.visitLabel(elseLabel);
+                        generator.mv.visitLdcInsn(0);
+
+                        generator.mv.visitLabel(endLabel);
+                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    }
+                    break;
+                case "=":
+                    {
+                        Label elseLabel = new Label();
+                        Label endLabel = new Label();
+                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
+                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
+                        generator.mv.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+
+                        generator.mv.visitLdcInsn(1);
+                        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+                        generator.mv.visitLabel(elseLabel);
+                        generator.mv.visitLdcInsn(0);
+
+                        generator.mv.visitLabel(endLabel);
+                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    }
+                    break;
+                case "<>":
+                    {
+                        Label elseLabel = new Label();
+                        Label endLabel = new Label();
+                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
+                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
+                        generator.mv.visitJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
+
+                        generator.mv.visitLdcInsn(1);
+                        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+                        generator.mv.visitLabel(elseLabel);
+                        generator.mv.visitLdcInsn(0);
+
+                        generator.mv.visitLabel(endLabel);
+                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
+                    }
                     break;
             }
         }

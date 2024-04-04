@@ -6,15 +6,13 @@ DECLARE
 	INTEGER z
 
 BEGIN
-	PRINT "Enter a number: "
-	READ x
-	PRINT "Enter another number: "
-	READ y
-	IF x > y THEN SET z:=10 * x
-	ELSE SET z:=12 * y
+	SET x := 12
+	SET y:= 13
+	IF x > y THEN SET z:=x
+	ELSE SET z:= y
 	ENDIF
-	WHILE x > 0 DO
-		PRINT x
-		SET x := x - 1
-	ENDWHILE
+	#WHILE x > 0 DO
+	#	PRINT x
+	#	SET x := x - 1
+	#ENDWHILE
 END

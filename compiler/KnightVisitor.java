@@ -10,6 +10,21 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     AsmGen generator;
     SymbolTable symbolTable = new SymbolTable();
 
+    public void loadIntegerOperand(String operand) {
+        if( symbolTable.contains(operand)) {
+            generator.mv.visitVarInsn(Opcodes.ILOAD, symbolTable.getEntry(operand).getVarIndex());
+        }else {
+            generator.mv.visitLdcInsn(Integer.valueOf(operand));
+        }
+    }
+    public void loadStringOperand(String operand) {
+        if( symbolTable.contains(operand)) {
+            generator.mv.visitVarInsn(Opcodes.ALOAD, symbolTable.getEntry(operand).getVarIndex());
+        }else {
+            generator.mv.visitLdcInsn(operand);
+        }
+    }
+
     public void printAll() {
         symbolTable.printAll();
     }
@@ -89,6 +104,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitIdentifier(KnightCodeParser.IdentifierContext ctx) {
+        System.out.println(ctx.ID().getText());
         return super.visitIdentifier(ctx);
     }
 
@@ -146,49 +162,40 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
 
         if( ctx.getChild(3).getChildCount() >0 && ctx.expr().getChildCount() == 1 ) {
             String value = ctx.expr().getText();
-            generator.mv.visitLdcInsn(Integer.valueOf(value));
+            loadIntegerOperand(value);
             generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
         }
         else if( ctx.getChild(3).getText().charAt(0) == '\"') {
             String value = ctx.getChild(3).getText().substring(1, ctx.getChild(3).getText().length()-1);
-            generator.mv.visitLdcInsn(value);
+            loadStringOperand(value);
             generator.mv.visitVarInsn(Opcodes.ASTORE, varToSet.getVarIndex());
         }
         else if( ctx.expr().getChildCount() == 3) {
-            Variable operand1 = symbolTable.getEntry(ctx.expr().getChild(0).getText());
-            Variable operand2 = symbolTable.getEntry(ctx.expr().getChild(2).getText());
+            String value1 = ctx.expr().getChild(0).getText();
+            String value2 = ctx.expr().getChild(2).getText();
+
+            loadIntegerOperand(value1);
+            loadIntegerOperand(value2);
+
             String operation = ctx.expr().getChild(1).getText();
             switch (operation){
                 case "+":
-                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
-                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                     generator.mv.visitInsn(Opcodes.IADD);
-                    generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
                     break;
                 case "-":
-                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
-                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                     generator.mv.visitInsn(Opcodes.ISUB);
-                    generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
                     break;
                 case "*":
-                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
-                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                     generator.mv.visitInsn(Opcodes.IMUL);
-                    generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
                     break;
                 case "/":
-                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
-                    generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                     generator.mv.visitInsn(Opcodes.IDIV);
-                    generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
                     break;
                 case ">":
                     {
+                        System.out.print("comparison");
                         Label elseLabel = new Label();
                         Label endLabel = new Label();
-                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
-                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                         generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, elseLabel);
 
                         generator.mv.visitLdcInsn(1);
@@ -203,11 +210,8 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                     break;
                 case "<":
                     {
-                        System.out.println("Less than triggered");
                         Label elseLabel = new Label();
                         Label endLabel = new Label();
-                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
-                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                         generator.mv.visitJumpInsn(Opcodes.IF_ICMPGE, elseLabel);
 
                         generator.mv.visitLdcInsn(1);
@@ -224,8 +228,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                     {
                         Label elseLabel = new Label();
                         Label endLabel = new Label();
-                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
-                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                         generator.mv.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
 
                         generator.mv.visitLdcInsn(1);
@@ -242,8 +244,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                     {
                         Label elseLabel = new Label();
                         Label endLabel = new Label();
-                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand1.getVarIndex());
-                        generator.mv.visitVarInsn(Opcodes.ILOAD, operand2.getVarIndex());
                         generator.mv.visitJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
 
                         generator.mv.visitLdcInsn(1);
@@ -257,6 +257,8 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                     }
                     break;
             }
+
+            generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
         }
         return super.visitSetvar(ctx);
     }
@@ -467,6 +469,42 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitDecision(KnightCodeParser.DecisionContext ctx) {
+        String operand1 = ctx.getChild(1).getText();
+        String operand2 = ctx.getChild(3).getText();
+        String operand = ctx.getChild(2).getText();
+
+        loadIntegerOperand(operand1);
+        loadIntegerOperand(operand2);
+
+        Label elseLabel = new Label();
+        Label endLabel = new Label();
+        switch( operand){
+            case ">":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, elseLabel);
+                break;
+            case "<":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPGE, elseLabel);
+                break;
+            case "=":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+                break;
+            case "<>":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
+                break;
+        }
+
+        visit(ctx.getChild(5));
+        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
+
+        generator.mv.visitLabel(elseLabel);
+        visit(ctx.getChild(7).getChild(0));
+
+        generator.mv.visitLabel(endLabel);
+
+
+
+
+
         return super.visitDecision(ctx);
     }
 

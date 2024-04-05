@@ -492,20 +492,25 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                 generator.mv.visitJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
                 break;
         }
+        int endOfIfBlock = 5;
+        while( !ctx.getChild(endOfIfBlock).getText().equals("ELSE") ) {
+            endOfIfBlock++;
+        }
 
-        visit(ctx.getChild(5));
+        for(int i = 5 ; i < endOfIfBlock ; i++) {
+            visit(ctx.getChild(i));
+        }
+
         generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
 
         generator.mv.visitLabel(elseLabel);
-        visit(ctx.getChild(7).getChild(0));
+        for(int i = endOfIfBlock ; i < ctx.getChildCount()-2 ; i++) {
+            visit(ctx.getChild(i));
+        }
+        visit(ctx.getChild(7));
 
         generator.mv.visitLabel(endLabel);
-
-
-
-
-
-        return super.visitDecision(ctx);
+        return null;
     }
 
     /**

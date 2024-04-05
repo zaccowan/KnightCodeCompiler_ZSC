@@ -3,14 +3,13 @@ PROGRAM Program1
 DECLARE
 	INTEGER x
 	INTEGER y
-    STRING z
+    INTEGER z
 
 BEGIN
 
 SET x := 12
 SET y := 13
-PRINT "Enter and string."
-READ z
+SET z := x + y
 
 PRINT x
 PRINT y

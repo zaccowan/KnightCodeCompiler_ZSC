@@ -6,11 +6,21 @@ DECLARE
 	INTEGER z
 
 BEGIN
-	SET x := 12
-	SET y:= 13
-	IF x > y THEN SET z:=x
-	ELSE SET z:= y
+    PRINT "Performing the comparison x > y"
+	PRINT "Enter a number for x."
+	READ x
+	PRINT "Enter a number for y."
+    READ y
+	IF x > y THEN
+	    SET z := x
+	    PRINT "SET z to x."
+	    PRINT "...."
+	ELSE
+	    SET z := y
+	    PRINT "SET z to x."
+    	PRINT "...."
 	ENDIF
+	PRINT z
 	#WHILE x > 0 DO
 	#	PRINT x
 	#	SET x := x - 1

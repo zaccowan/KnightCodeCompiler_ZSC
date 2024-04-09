@@ -9,7 +9,7 @@ BEGIN
 	READ name
 	PRINT "Enter repetitions: "
 	READ reps
-	WHILE reps> 0 DO
+	WHILE reps> 10 DO
 		PRINT name
 		SET reps := reps - 1
 	ENDWHILE

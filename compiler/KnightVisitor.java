@@ -104,7 +104,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitIdentifier(KnightCodeParser.IdentifierContext ctx) {
-        System.out.println(ctx.ID().getText());
         return super.visitIdentifier(ctx);
     }
 
@@ -478,6 +477,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
 
         Label elseLabel = new Label();
         Label endLabel = new Label();
+
         switch( operand){
             case ">":
                 generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, elseLabel);
@@ -523,6 +523,44 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitLoop(KnightCodeParser.LoopContext ctx) {
-        return super.visitLoop(ctx);
+        String operand1 = ctx.getChild(1).getText();
+        String operand2 = ctx.getChild(3).getText();
+        String operand = ctx.getChild(2).getText();
+
+        loadIntegerOperand(operand1);
+        loadIntegerOperand(operand2);
+
+        Label endLabel = new Label();
+        Label whileStartLabel = new Label();
+
+        generator.mv.visitLabel(whileStartLabel);
+        loadIntegerOperand(operand1);
+        loadIntegerOperand(operand2);
+        switch( operand ){
+            case ">":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, endLabel);
+                break;
+            case "<":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPGE, endLabel);
+                break;
+            case "=":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPNE, endLabel);
+                break;
+            case "<>":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPEQ, endLabel);
+                break;
+        }
+
+
+        for(int i = 5 ; i < ctx.getChildCount()-1 ; i++) {
+            visit(ctx.getChild(i));
+        }
+        generator.mv.visitJumpInsn(Opcodes.GOTO, whileStartLabel);
+
+        generator.mv.visitLabel(endLabel);
+
+        generator.mv.visitInsn(Opcodes.RETURN);
+
+        return null;
     }
 }

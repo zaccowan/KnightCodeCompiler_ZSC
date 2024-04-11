@@ -52,18 +52,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
         return super.visitFile(ctx);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitDeclare(KnightCodeParser.DeclareContext ctx) {
-        return super.visitDeclare(ctx);
-    }
 
     /**
      * {@inheritDoc}
@@ -94,57 +82,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
         return super.visitVariable(ctx);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitIdentifier(KnightCodeParser.IdentifierContext ctx) {
-        return super.visitIdentifier(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitVartype(KnightCodeParser.VartypeContext ctx) {
-        return super.visitVartype(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitBody(KnightCodeParser.BodyContext ctx) {
-        return super.visitBody(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitStat(KnightCodeParser.StatContext ctx) {
-        return super.visitStat(ctx);
-    }
 
     /**
      * {@inheritDoc}
@@ -159,16 +96,19 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
         String symbolToSet = ctx.getChild(1).getText();
         Variable varToSet = symbolTable.getEntry(symbolToSet);
 
+        // Handle number
         if( ctx.getChild(3).getChildCount() >0 && ctx.expr().getChildCount() == 1 ) {
             String value = ctx.expr().getText();
             loadIntegerOperand(value);
             generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
         }
+        //Handle String
         else if( ctx.getChild(3).getText().charAt(0) == '\"') {
             String value = ctx.getChild(3).getText().substring(1, ctx.getChild(3).getText().length()-1);
             loadStringOperand(value);
             generator.mv.visitVarInsn(Opcodes.ASTORE, varToSet.getVarIndex());
         }
+        // Handle Expression
         else if( ctx.expr().getChildCount() == 3) {
             String value1 = ctx.expr().getChild(0).getText();
             String value2 = ctx.expr().getChild(2).getText();
@@ -192,11 +132,9 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                     break;
                 case ">":
                     {
-                        System.out.print("comparison");
                         Label elseLabel = new Label();
                         Label endLabel = new Label();
                         generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, elseLabel);
-
                         generator.mv.visitLdcInsn(1);
                         generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
 
@@ -204,7 +142,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                         generator.mv.visitLdcInsn(0);
 
                         generator.mv.visitLabel(endLabel);
-                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
                     }
                     break;
                 case "<":
@@ -220,7 +157,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                         generator.mv.visitLdcInsn(0);
 
                         generator.mv.visitLabel(endLabel);
-                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
                     }
                     break;
                 case "=":
@@ -236,7 +172,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                         generator.mv.visitLdcInsn(0);
 
                         generator.mv.visitLabel(endLabel);
-                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
                     }
                     break;
                 case "<>":
@@ -252,7 +187,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                         generator.mv.visitLdcInsn(0);
 
                         generator.mv.visitLabel(endLabel);
-                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
                     }
                     break;
             }
@@ -326,6 +260,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     public Object visitNumber(KnightCodeParser.NumberContext ctx) {
         return super.visitNumber(ctx);
     }
+
 
     /**
      * {@inheritDoc}

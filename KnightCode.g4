@@ -8,7 +8,7 @@ file : 'PROGRAM' ID declare body ;
 declare : 'DECLARE' variable+ ;
 variable : vartype identifier ;
 identifier: ID ;
-vartype : 'INTEGER' |  'STRING' ;
+vartype : 'INTEGER' |  'STRING' | 'BOOLEAN' ;
 body : 'BEGIN' stat+ 'END' ;
 stat : setvar
 	| expr
@@ -17,7 +17,7 @@ stat : setvar
 	| decision
 	| loop
     ;
-setvar : 'SET' ID ASSIGN (expr | STRING) ;
+setvar : 'SET' ID ASSIGN (expr | STRING ) ;
 
 expr : '(' expr ')'		# Parenthesis		
 	 | expr MUL expr	# Multiplication
@@ -26,6 +26,7 @@ expr : '(' expr ')'		# Parenthesis
 	 | expr SUB expr    # Subtraction
 	 | expr comp expr   # Comparison
 	 | NUMBER           # Number
+	 | TF               # TF
 	 | ID   		  	# Id														
      ;	
 
@@ -41,6 +42,7 @@ loop : 'WHILE' (NUMBER | ID) comp (NUMBER | ID) 'DO' stat+ 'ENDWHILE' ;
 
 //LEXER RULES
 ID : LETTER (LETTER | [0-9])* ;
+TF : 'TRUE' | 'FALSE' ;
 ESC : ('\\"' | '\\\\') ;
 STRING : '"' (ESC|.)*? '"' ;
 ASSIGN : ':=' ;

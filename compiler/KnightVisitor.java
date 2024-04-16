@@ -17,13 +17,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
             generator.mv.visitLdcInsn(Integer.valueOf(operand));
         }
     }
-    public void loadStringOperand(String operand) {
-        if( symbolTable.contains(operand)) {
-            generator.mv.visitVarInsn(Opcodes.ALOAD, symbolTable.getEntry(operand).getVarIndex());
-        }else {
-            generator.mv.visitLdcInsn(operand);
-        }
-    }
 
     public void printAll() {
         symbolTable.printAll();
@@ -61,19 +54,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      * @param ctx
      */
     @Override
-    public Object visitDeclare(KnightCodeParser.DeclareContext ctx) {
-        return super.visitDeclare(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
     public Object visitVariable(KnightCodeParser.VariableContext ctx) {
         addressIndex++;
         int type = Variable.TYPE_STRING;
@@ -94,57 +74,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
         return super.visitVariable(ctx);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitIdentifier(KnightCodeParser.IdentifierContext ctx) {
-        return super.visitIdentifier(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitVartype(KnightCodeParser.VartypeContext ctx) {
-        return super.visitVartype(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitBody(KnightCodeParser.BodyContext ctx) {
-        return super.visitBody(ctx);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * <p>The default implementation returns the result of calling
-     * {@link #visitChildren} on {@code ctx}.</p>
-     *
-     * @param ctx
-     */
-    @Override
-    public Object visitStat(KnightCodeParser.StatContext ctx) {
-        return super.visitStat(ctx);
-    }
 
     /**
      * {@inheritDoc}
@@ -158,108 +87,24 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     public Object visitSetvar(KnightCodeParser.SetvarContext ctx) {
         String symbolToSet = ctx.getChild(1).getText();
         Variable varToSet = symbolTable.getEntry(symbolToSet);
+        System.out.println(ctx.getChild(3).getChildCount());
 
-        if( ctx.getChild(3).getChildCount() >0 && ctx.expr().getChildCount() == 1 ) {
-            String value = ctx.expr().getText();
-            loadIntegerOperand(value);
-            generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
-        }
-        else if( ctx.getChild(3).getText().charAt(0) == '\"') {
-            String value = ctx.getChild(3).getText().substring(1, ctx.getChild(3).getText().length()-1);
-            loadStringOperand(value);
+        if( ctx.getChild(3).getChildCount() == 0 ) {
+            String operand = ctx.getChild(3).getText();
+            if( operand.charAt(0) == '\"') {
+                String value = ctx.getChild(3).getText().substring(1, ctx.getChild(3).getText().length()-1);
+                generator.mv.visitLdcInsn(value);
+            } else {
+                generator.mv.visitVarInsn(Opcodes.ALOAD, symbolTable.getEntry(operand).getVarIndex());
+            }
             generator.mv.visitVarInsn(Opcodes.ASTORE, varToSet.getVarIndex());
         }
-        else if( ctx.expr().getChildCount() == 3) {
-            String value1 = ctx.expr().getChild(0).getText();
-            String value2 = ctx.expr().getChild(2).getText();
-
-            loadIntegerOperand(value1);
-            loadIntegerOperand(value2);
-
-            String operation = ctx.expr().getChild(1).getText();
-            switch (operation){
-                case "+":
-                    generator.mv.visitInsn(Opcodes.IADD);
-                    break;
-                case "-":
-                    generator.mv.visitInsn(Opcodes.ISUB);
-                    break;
-                case "*":
-                    generator.mv.visitInsn(Opcodes.IMUL);
-                    break;
-                case "/":
-                    generator.mv.visitInsn(Opcodes.IDIV);
-                    break;
-                case ">":
-                    {
-                        System.out.print("comparison");
-                        Label elseLabel = new Label();
-                        Label endLabel = new Label();
-                        generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, elseLabel);
-
-                        generator.mv.visitLdcInsn(1);
-                        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
-
-                        generator.mv.visitLabel(elseLabel);
-                        generator.mv.visitLdcInsn(0);
-
-                        generator.mv.visitLabel(endLabel);
-                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
-                    }
-                    break;
-                case "<":
-                    {
-                        Label elseLabel = new Label();
-                        Label endLabel = new Label();
-                        generator.mv.visitJumpInsn(Opcodes.IF_ICMPGE, elseLabel);
-
-                        generator.mv.visitLdcInsn(1);
-                        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
-
-                        generator.mv.visitLabel(elseLabel);
-                        generator.mv.visitLdcInsn(0);
-
-                        generator.mv.visitLabel(endLabel);
-                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
-                    }
-                    break;
-                case "=":
-                    {
-                        Label elseLabel = new Label();
-                        Label endLabel = new Label();
-                        generator.mv.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
-
-                        generator.mv.visitLdcInsn(1);
-                        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
-
-                        generator.mv.visitLabel(elseLabel);
-                        generator.mv.visitLdcInsn(0);
-
-                        generator.mv.visitLabel(endLabel);
-                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
-                    }
-                    break;
-                case "<>":
-                    {
-                        Label elseLabel = new Label();
-                        Label endLabel = new Label();
-                        generator.mv.visitJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
-
-                        generator.mv.visitLdcInsn(1);
-                        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
-
-                        generator.mv.visitLabel(elseLabel);
-                        generator.mv.visitLdcInsn(0);
-
-                        generator.mv.visitLabel(endLabel);
-                        generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
-                    }
-                    break;
-            }
-
+        else {
+            visit(ctx.getChild(3));
             generator.mv.visitVarInsn(Opcodes.ISTORE, varToSet.getVarIndex());
         }
-        return super.visitSetvar(ctx);
+
+        return null;
     }
 
     /**
@@ -272,7 +117,8 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitParenthesis(KnightCodeParser.ParenthesisContext ctx) {
-        return super.visitParenthesis(ctx);
+        visit(ctx.getChild(1));
+        return null;
     }
 
     /**
@@ -285,7 +131,10 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitMultiplication(KnightCodeParser.MultiplicationContext ctx) {
-        return super.visitMultiplication(ctx);
+        visit(ctx.getChild(0));
+        visit(ctx.getChild(2));
+        generator.mv.visitInsn(Opcodes.IMUL);
+        return null;
     }
 
     /**
@@ -298,7 +147,10 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitAddition(KnightCodeParser.AdditionContext ctx) {
-        return super.visitAddition(ctx);
+        visit(ctx.getChild(0));
+        visit(ctx.getChild(2));
+        generator.mv.visitInsn(Opcodes.IADD);
+        return null;
     }
 
     /**
@@ -311,7 +163,10 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitSubtraction(KnightCodeParser.SubtractionContext ctx) {
-        return super.visitSubtraction(ctx);
+        visit(ctx.getChild(0));
+        visit(ctx.getChild(2));
+        generator.mv.visitInsn(Opcodes.ISUB);
+        return null;
     }
 
     /**
@@ -324,6 +179,8 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitNumber(KnightCodeParser.NumberContext ctx) {
+        String value = ctx.getText();
+        loadIntegerOperand(value);
         return super.visitNumber(ctx);
     }
 
@@ -337,7 +194,31 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitComparison(KnightCodeParser.ComparisonContext ctx) {
-        return super.visitComparison(ctx);
+        visit(ctx.getChild(0));
+        visit(ctx.getChild(2));
+
+        Label elseLabel = new Label();
+        Label endLabel = new Label();
+        switch (ctx.getChild(1).getText()) {
+            case ">":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, elseLabel);
+                break;
+            case "<":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPGE, elseLabel);
+                break;
+            case "=":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPNE, elseLabel);
+                break;
+            case "<>":
+                generator.mv.visitJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
+                break;
+        }
+        generator.mv.visitLdcInsn(1);
+        generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
+        generator.mv.visitLabel(elseLabel);
+        generator.mv.visitLdcInsn(0);
+        generator.mv.visitLabel(endLabel);
+        return null;
     }
 
     /**
@@ -350,7 +231,10 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitDivision(KnightCodeParser.DivisionContext ctx) {
-        return super.visitDivision(ctx);
+        visit(ctx.getChild(0));
+        visit(ctx.getChild(2));
+        generator.mv.visitInsn(Opcodes.IDIV);
+        return null;
     }
 
     /**
@@ -363,6 +247,10 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitId(KnightCodeParser.IdContext ctx) {
+        String symbol = ctx.getText();
+        if( symbolTable.contains(symbol)) {
+            generator.mv.visitVarInsn(Opcodes.ILOAD, symbolTable.getEntry(symbol).getVarIndex());
+        }
         return super.visitId(ctx);
     }
 

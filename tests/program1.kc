@@ -3,17 +3,21 @@ PROGRAM Program1
 DECLARE
 	INTEGER x
 	INTEGER y
-    INTEGER z
+    STRING first
+    STRING last
+    STRING name
 
 BEGIN
 
 SET x := 12
-SET y := 13
-SET z := x + y
+SET y := 10
+SET first := "Zac"
+SET last := "Cowan"
+SET name := bob
 
 PRINT x
 PRINT y
-PRINT z
+#PRINT z
 
 END
 

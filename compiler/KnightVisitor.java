@@ -7,8 +7,14 @@ import org.objectweb.asm.Opcodes;
 
 public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
 
+    KnightVisitor() {}
+    KnightVisitor(String outputFile) {
+        this.outputFile = outputFile;
+    }
+
     AsmGen generator;
     SymbolTable symbolTable = new SymbolTable();
+    String outputFile = null;
 
     public void loadIntegerOperand(String operand) {
         if( symbolTable.contains(operand)) {
@@ -25,7 +31,11 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     int addressIndex = 3; // Starts at 3 to reserve spots at the beginning for instances of scanners, ...
 
     public void end() {
-        generator.writeToFile();
+        if( outputFile == null) {
+            generator.writeToFile();
+        } else {
+            generator.writeToFile(outputFile);
+        }
     }
 
 

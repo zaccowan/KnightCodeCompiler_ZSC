@@ -45,4 +45,18 @@ public class AsmGen {
         System.out.println("Done!"); // Print Completion Message
     }
 
+    public void writeToFile(String outputFile) {
+        mv.visitInsn(Opcodes.RETURN); // Return from main method.
+        mv.visitMaxs(0,0); // maximum stack size and max number of local variable for main.
+        mv.visitEnd(); // end the main method.
+
+        cw.visitEnd(); // Termination point for class writer.
+
+        byte[] b = cw.toByteArray(); // Store data created by Class Writer to a byte array
+
+        Utilities.writeFile(b, "./" + outputFile + ".class"); // Write the byte array out to a class file
+
+        System.out.println("Done!"); // Print Completion Message
+    }
+
 }

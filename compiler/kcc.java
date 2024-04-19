@@ -24,6 +24,8 @@ public class kcc {
 
         String file = args[0];
         String programName = args[0].substring(file.indexOf('/')+1, file.indexOf('.'));
+
+
         programName = Pattern.compile("^.").matcher(programName).replaceFirst(m -> m.group().toUpperCase());
 
         AsmGen generator;
@@ -33,7 +35,13 @@ public class kcc {
         KnightCodeParser parser = new KnightCodeParser(tokenStream);
 
         ParseTree tree = parser.file();
-        KnightVisitor visitor = new KnightVisitor();
+
+        KnightVisitor visitor;
+        if(args.length == 2) {
+            visitor = new KnightVisitor(args[1]);
+        } else {
+            visitor = new KnightVisitor();
+        }
         visitor.visit(tree);
 
         visitor.end(); //Writes Bytecode out to file

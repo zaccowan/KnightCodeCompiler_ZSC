@@ -3,6 +3,9 @@ package compiler;
 import org.objectweb.asm.*;
 import org.objectweb.asm.Opcodes;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class AsmGen {
 
     protected ClassWriter cw;
@@ -40,7 +43,7 @@ public class AsmGen {
 
         byte[] b = cw.toByteArray(); // Store data created by Class Writer to a byte array
 
-        Utilities.writeFile(b, "./output/" + programName + ".class"); // Write the byte array out to a class file
+        writeFile(b, "./output/" + programName + ".class"); // Write the byte array out to a class file
 
         System.out.println("Done!"); // Print Completion Message
     }
@@ -54,9 +57,22 @@ public class AsmGen {
 
         byte[] b = cw.toByteArray(); // Store data created by Class Writer to a byte array
 
-        Utilities.writeFile(b, "./" + outputFile + ".class"); // Write the byte array out to a class file
+        writeFile(b, "./" + outputFile + ".class"); // Write the byte array out to a class file
 
         System.out.println("Done!"); // Print Completion Message
     }
 
-}
+    public static void writeFile(byte[] bytearray, String fileName){
+
+        try{
+            FileOutputStream out = new FileOutputStream(fileName);
+            out.write(bytearray);
+            out.close();
+        }
+        catch(IOException e){
+            System.out.println(e.getMessage());
+        }
+
+
+
+    }

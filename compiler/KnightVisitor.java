@@ -22,7 +22,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
         symbolTable.printAll();
     }
 
-
     int addressIndex = 3; // Starts at 3 to reserve spots at the beginning for instances of scanners, ...
 
     public void end() {
@@ -87,7 +86,6 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     public Object visitSetvar(KnightCodeParser.SetvarContext ctx) {
         String symbolToSet = ctx.getChild(1).getText();
         Variable varToSet = symbolTable.getEntry(symbolToSet);
-        System.out.println(ctx.getChild(3).getChildCount());
 
         if( ctx.getChild(3).getChildCount() == 0 ) {
             String operand = ctx.getChild(3).getText();
@@ -180,7 +178,9 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     @Override
     public Object visitNumber(KnightCodeParser.NumberContext ctx) {
         String value = ctx.getText();
-        loadIntegerOperand(value);
+        System.out.println(value);
+        generator.mv.visitLdcInsn(Integer.valueOf(value));
+//        loadIntegerOperand(value);
         return super.visitNumber(ctx);
     }
 
@@ -194,6 +194,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitComparison(KnightCodeParser.ComparisonContext ctx) {
+        System.out.println("called");
         visit(ctx.getChild(0));
         visit(ctx.getChild(2));
 
@@ -248,6 +249,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
     @Override
     public Object visitId(KnightCodeParser.IdContext ctx) {
         String symbol = ctx.getText();
+        System.out.println(symbol);
         if( symbolTable.contains(symbol)) {
             generator.mv.visitVarInsn(Opcodes.ILOAD, symbolTable.getEntry(symbol).getVarIndex());
         }
@@ -264,7 +266,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
      */
     @Override
     public Object visitComp(KnightCodeParser.CompContext ctx) {
-        return super.visitComp(ctx);
+        return null;
     }
 
     /**
@@ -366,7 +368,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
         Label elseLabel = new Label();
         Label endLabel = new Label();
 
-        switch( operand){
+        switch( operand ){
             case ">":
                 generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, elseLabel);
                 break;
@@ -380,10 +382,12 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
                 generator.mv.visitJumpInsn(Opcodes.IF_ICMPEQ, elseLabel);
                 break;
         }
+
         int endOfIfBlock = 5;
-        while( !ctx.getChild(endOfIfBlock).getText().equals("ELSE") ) {
+        while( !ctx.getChild(endOfIfBlock).getText().equals("ELSE") && !ctx.getChild(endOfIfBlock).getText().equals("ENDIF") ){
             endOfIfBlock++;
         }
+        System.out.println(endOfIfBlock);
 
         for(int i = 5 ; i < endOfIfBlock ; i++) {
             visit(ctx.getChild(i));
@@ -392,12 +396,12 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
         generator.mv.visitJumpInsn(Opcodes.GOTO, endLabel);
 
         generator.mv.visitLabel(elseLabel);
-        for(int i = endOfIfBlock ; i < ctx.getChildCount()-2 ; i++) {
+        for(int i = endOfIfBlock ; i < ctx.getChildCount()-1 ; i++) {
             visit(ctx.getChild(i));
         }
-        visit(ctx.getChild(7));
 
         generator.mv.visitLabel(endLabel);
+
         return null;
     }
 
@@ -424,6 +428,7 @@ public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
         generator.mv.visitLabel(whileStartLabel);
         loadIntegerOperand(operand1);
         loadIntegerOperand(operand2);
+
         switch( operand ){
             case ">":
                 generator.mv.visitJumpInsn(Opcodes.IF_ICMPLE, endLabel);

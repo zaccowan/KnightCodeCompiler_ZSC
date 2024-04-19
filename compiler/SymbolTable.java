@@ -2,6 +2,14 @@ package compiler;
 
 import java.util.HashMap;
 
+/**
+ * SymbolTable is responsible for storing Variable representations for access by the compiler.
+ * @author Zac Cowan
+ * @version 1.0
+ * Assignment 5
+ * CS322 - Compiler Construction
+ * Spring 2024
+ **/
 public class SymbolTable {
     private HashMap<String, Variable> symbolTable;
 

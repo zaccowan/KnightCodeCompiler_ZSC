@@ -5,6 +5,14 @@ import lexparse.KnightCodeParser;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 
+/**
+ * KnightVisitor is responsible for walking the antlr generated parse tree and respective ASM calls to create bytecode.
+ * @author Zac Cowan
+ * @version 1.0
+ * Assignment 5
+ * CS322 - Compiler Construction
+ * Spring 2024
+ **/
 public class KnightVisitor extends KnightCodeBaseVisitor<Object> {
 
     KnightVisitor() {}

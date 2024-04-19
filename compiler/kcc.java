@@ -10,9 +10,21 @@ import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.IOException;
-import java.util.regex.Pattern;
 
+/**
+ * kcc is the compiler class that brings all components of the compiler together into one application.
+ * @author Zac Cowan
+ * @version 1.0
+ * Assignment 5
+ * CS322 - Compiler Construction
+ * Spring 2024
+ **/
 public class kcc {
+    /**
+     * Main method used to run compiler on a given .KC file.
+     * @param args args[0] is the KC file to compile, args[1] is an optional output location and name.
+     * @throws IOException exception for invalid IO
+     */
     public static void main(String[] args) throws IOException {
 
 

@@ -1,5 +1,13 @@
 package compiler;
 
+/**
+ * Variable is a representation of a variables type and JVM var index.
+ * @author Zac Cowan
+ * @version 1.0
+ * Assignment 5
+ * CS322 - Compiler Construction
+ * Spring 2024
+ **/
 public class Variable {
 
     // Built in Variable Types

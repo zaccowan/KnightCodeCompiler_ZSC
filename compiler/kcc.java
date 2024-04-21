@@ -30,22 +30,37 @@ public class kcc {
 
         String file = args[0];
 
+        // Takes in characters from file
         CharStream charStream = CharStreams.fromFileName(file);
+        // Creates an antlr generated lexer to do lexical analysis of file character stream.
         KnightCodeLexer lexer = new KnightCodeLexer(charStream);
+        // Token Steam from the analysis done by the lexer.
         TokenStream tokenStream = new CommonTokenStream(lexer);
+        // Creates an antlr generated parser to parse the tokens and build the parse tree.
         KnightCodeParser parser = new KnightCodeParser(tokenStream);
-
+        // Store the parse tree as a ParseTree called tree.
         ParseTree tree = parser.file();
 
+        // Delares a visitor that will walk the parse tree and generate non-boilerplate bytecode.
+        // Note: the boiler plate ASM calls are done by the AsmGen class which is created inside of KnightVisitor.
         KnightVisitor visitor;
+
+        // Instantiate the visitor.
+        // If there are two arguments supplied when the compiler is called, retrieve the file output location.
         if(args.length == 2) {
             visitor = new KnightVisitor(args[1]);
-        } else {
+        }
+        // If the call does not supply and output location and name, default to output: "./ouput/<program_name>.class"
+        else {
             visitor = new KnightVisitor();
         }
+        // Visit the root of the tree to begin the visitors process of bytecode generation.
         visitor.visit(tree);
 
+        // Calls some final boilerplate needed for a .class file and writes to specified location.
         visitor.end(); //Writes Bytecode out to file
-        visitor.printAll();
+
+        //System.out.println("Symbol table information because why not: ");
+        //visitor.printAll();
     }
 }

@@ -1,7 +1,0 @@
-PROGRAM SimplePrint
-DECLARE
-BEGIN
-
-PRINT x
-
-END

@@ -16,10 +16,17 @@ import java.io.IOException;
  **/
 public class AsmGen {
 
+    // Class Writer used to write out bytecodes to class file.
     protected ClassWriter cw;
+    // Method visitor to dictate what bytecodes are being written to the class.
     protected MethodVisitor mv;
+    // Name of the program used for writing out to .class file and for naming the constructor.
     private final String programName;
 
+    /**
+     * Constructor to generate boilerplate code need for ASM generated .class to execute.
+     * @param programName Name of program.
+     */
     public AsmGen(String programName) {
         this.programName = programName;
 
@@ -38,10 +45,15 @@ public class AsmGen {
             mv.visitEnd(); // visit end of class
         }
 
+        // Bytecode to establish main method: public static void main (String [] args) {}
         mv = cw.visitMethod(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
         mv.visitCode();
     }
 
+    /**
+     * Used to call write final bytecode boilerplate after visitor has written program writer.
+     * Calls final bytecodes to write and calls method to actually write out the file.
+     */
     public void writeToFile() {
         mv.visitInsn(Opcodes.RETURN); // Return from main method.
         mv.visitMaxs(0, 0); // maximum stack size and max number of local variable for main.
@@ -56,6 +68,12 @@ public class AsmGen {
         System.out.println("Done!"); // Print Completion Message
     }
 
+
+    /**
+     * Used to call write final bytecode boilerplate after visitor has written program writer.
+     * Calls final bytecodes to write and calls method to actually write out the file.
+     * @param outputFile Name of file to write out.
+     */
     public void writeToFile(String outputFile) {
         mv.visitInsn(Opcodes.RETURN); // Return from main method.
         mv.visitMaxs(0, 0); // maximum stack size and max number of local variable for main.
@@ -70,8 +88,13 @@ public class AsmGen {
         System.out.println("Done!"); // Print Completion Message
     }
 
-    public static void writeFile(byte[] bytearray, String fileName) {
 
+    /**
+     * Writes the actual bytes to a file.
+     * @param bytearray Bytes to write out.
+     * @param fileName Name used to write the file to the file system.
+     */
+    public static void writeFile(byte[] bytearray, String fileName) {
         try {
             FileOutputStream out = new FileOutputStream(fileName);
             out.write(bytearray);
@@ -79,8 +102,5 @@ public class AsmGen {
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-
-
     }
-
 }

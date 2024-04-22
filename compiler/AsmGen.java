@@ -32,7 +32,7 @@ public class AsmGen {
 
 
         cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES); // New ClassWriter where stack map frames are automatically computed from scratch. (Per ASM Documentation)
-        cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, programName, null, "java/lang/Object", null);
+        cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, "output/" +programName, null, "java/lang/Object", null);
 
         {   // Setup for Constructor.
             MethodVisitor mv = cw.visitMethod(Opcodes.ACC_PUBLIC, "<init>", "()V", null, null);
